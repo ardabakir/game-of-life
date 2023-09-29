@@ -15,33 +15,84 @@
 
         Console.WriteLine(col + " " + row);
 
-        int[,] myArr = new int[col,row];
-
+        Cell[,] myArr = new Cell[col,row];
 
         Random rnd = new Random();
-        int numOfLiveCells = rnd.Next((int)Math.Ceiling(row * col * 0.75));
-        for (int i = 0; i < numOfLiveCells; i++)
-        {
-            int posX = rnd.Next(col);
-            int posY = rnd.Next(row);
-            while (myArr[posX,posY] != 0)
-            {
-                posX = rnd.Next(col);
-                posY = rnd.Next(row);
-            }
-            myArr[posX, posY]++;
-        }
 
         for (int i = 0; i < myArr.GetLength(0); i++)
         {
-            for (int j = 0; j < myArr.GetLength(1); j++)
+            for(int j=0; j < myArr.GetLength(1); j++)
             {
-                Console.Write(myArr[i, j] + " ");
+                myArr[i, j] = new Cell(i,j);
+                int r = rnd.Next(10);
+                if (r <= 3)
+                {
+                    myArr[i, j].IsAlive = true;
+                    Console.Write("X ");
+                }
+                else
+                {
+                    Console.Write("O ");
+                }
             }
             Console.WriteLine();
         }
-    
+
         Console.ReadKey();
         Console.ReadLine();
+    }
+
+    private class Cell
+    {
+        public int AliveNeighborCount { get; set; }
+        public bool IsAlive { get; set; }
+        public int XPos { get; set; }
+        public int YPos { get; set; }
+
+
+        public bool IsOverpopulated()
+        {
+            return this.AliveNeighborCount > 3;
+        }
+
+        public bool IsUnderpopulated()
+        {
+            return this.AliveNeighborCount < 2;
+        }
+
+        public void NextGeneration()
+        {
+            if (this.IsAlive)
+            {
+                if(this.IsUnderpopulated() || this.IsOverpopulated())
+                {
+                    this.IsAlive = false;
+                }
+                else
+                {
+                    this.IsAlive = true;
+                }
+            }
+            else
+            {
+                if(this.AliveNeighborCount == 3)
+                {
+                    this.IsAlive = true;
+                }
+                else
+                {
+                    this.IsAlive = false;
+                }
+            }
+        }
+        public Cell(int posX, int posY)
+        {
+            this.AliveNeighborCount = 0;
+            this.IsAlive = false;
+            this.XPos = posX;
+            this.YPos = posY;
+            
+        }
+        
     }
 }
