@@ -15,7 +15,7 @@
 
         Console.WriteLine(col + " " + row);
 
-        Cell[,] myArr = new Cell[col,row];
+        Cell[,] myArr = new Cell[col+2,row+2];
 
         Random rnd = new Random();
 
@@ -25,7 +25,11 @@
             {
                 myArr[i, j] = new Cell(i,j);
                 int r = rnd.Next(10);
-                if (r <= 3)
+                if (i==0 || i==myArr.GetLength(0)-1 || j==0 || j == myArr.GetLength(1)-1)
+                {
+                    myArr[i, j].IsAlive = false;
+                }
+                else if (r <= 5)
                 {
                     myArr[i, j].IsAlive = true;
                     Console.Write("X ");
@@ -37,10 +41,64 @@
             }
             Console.WriteLine();
         }
-
+        string exitGame = "";
+        for (int i = 1; i < myArr.GetLength(0) - 1; i++)
+        {
+            for (int j = 1; j < myArr.GetLength(1) - 1; j++)
+            {
+                CheckNeighbors(ref myArr, i, j);
+            }
+        }
         Console.ReadKey();
-        Console.ReadLine();
+        while (exitGame != "exit")
+        {
+            for (int i = 1; i < myArr.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < myArr.GetLength(1) - 1; j++)
+                {
+                    myArr[i, j].NextGeneration();
+                    if (myArr[i, j].IsAlive)
+                    {
+                        Console.Write("X ");
+                    }
+                    else
+                    {
+                        Console.Write("O ");
+                    }
+                }
+                Console.WriteLine();
+            }
+            for (int i = 1; i < myArr.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < myArr.GetLength(1) - 1; j++)
+                {
+                    CheckNeighbors(ref myArr, i, j);
+                }
+            }
+            exitGame = Console.ReadLine();
+        }
+
     }
+
+    private static void CheckNeighbors(ref Cell[,] arr, int x, int y)
+    {
+        int aliveCount = 0;
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                if (i != 0 || j != 0)
+                {
+                    if (arr[x + i, y + j].IsAlive)
+                    {
+                        aliveCount = aliveCount + 1;
+                    }
+                }
+            }
+        }
+        arr[x,y].AliveNeighborCount = aliveCount;
+    }
+
 
     private class Cell
     {
@@ -85,6 +143,28 @@
                 }
             }
         }
+
+        public void CheckNeighbors(Cell[,] myArr)
+        {
+            int aliveCount = 0;
+            for (int i = -1; i <= 1; i++)
+            {
+                for (int j = -1; j <= 1; j++)
+                {
+                    if (i != 0 && j != 0)
+                    {
+                        if (myArr[this.XPos + i, this.YPos + j].IsAlive)
+                        {
+                            aliveCount++;
+                        }
+                    }
+                }
+            }
+            this.AliveNeighborCount = aliveCount;
+        }
+
+
+
         public Cell(int posX, int posY)
         {
             this.AliveNeighborCount = 0;
